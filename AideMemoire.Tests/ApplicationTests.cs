@@ -1,21 +1,20 @@
-﻿namespace AideMemoire.Tests;
+﻿using System.CommandLine;
+using System.CommandLine.IO;
+
+namespace AideMemoire.Tests;
 
 public class ApplicationTests {
-    [Fact]
-    public async Task RunAsync_WithEmptyArgs_ReturnsZero() {
-        var app = new Application();
-        var args = Array.Empty<string>();
+    private IConsole console = new TestConsole();
 
-        var result = await app.RunAsync(args);
-
-        Assert.Equal(0, result);
+    private Application CreateApplication() {
+        return new Application(console);
     }
 
     [Fact]
-    public async Task RunAsync_WithVersionCommand_ReturnsZero() {
-        var app = new Application();
-        var args = new[] { "version" };
+    public async Task RunAsync_WithEmptyArgs_ReturnsZero() {
+        Application app = CreateApplication();
 
+        var args = Array.Empty<string>();
         var result = await app.RunAsync(args);
 
         Assert.Equal(0, result);
@@ -23,11 +22,23 @@ public class ApplicationTests {
 
     [Fact]
     public async Task RunAsync_WithHelpOption_ReturnsZero() {
-        var app = new Application();
-        var args = new[] { "--help" };
+        Application app = CreateApplication();
 
+        var args = new[] { "--help" };
         var result = await app.RunAsync(args);
 
         Assert.Equal(0, result);
+    }
+
+    [Fact]
+    public async Task RunAsync_WithAboutCommand_OutputsCorrectInformation() {
+        Application app = CreateApplication();
+
+        var args = new[] { "about" };
+        await app.RunAsync(args);
+
+        var output = console.Out.ToString();
+        Assert.Contains("aide-mémoire:", output);
+        Assert.Contains("v0.1", output);
     }
 }
