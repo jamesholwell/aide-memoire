@@ -16,7 +16,7 @@ public class LearnHandler : IApplicationHandler {
         var urlArgument = new Argument<string>("url", "Feed URL e.g. https://feeds.bbci.co.uk/news/rss.xml");
         rssCommand.AddArgument(urlArgument);
         rssCommand.SetHandler(
-            LearnRssFeedAsync,
+            ExecuteAsync,
             new ConsoleBinder(),
             new HttpClientFactoryBinder(),
             urlArgument);
@@ -24,24 +24,10 @@ public class LearnHandler : IApplicationHandler {
         root.AddCommand(learnCommand);
     }
 
-    private static async Task LearnRssFeedAsync(IConsole console, IHttpClientFactory httpClientFactory, string url) {
+    internal static async Task ExecuteAsync(IConsole console, IHttpClientFactory httpClientFactory, string url) {
         try {
             var feed = await ReadRssFeedAsync(httpClientFactory, url);
-
-            console.WriteLine($"Feed Title: {feed.Title.Text}");
-            console.WriteLine($"Feed Description: {feed.Description.Text}");
-            console.WriteLine($"Number of items: {feed.Items.Count()}");
-            console.WriteLine(string.Empty);
-
-            foreach (var item in feed.Items) {
-                console.WriteLine($"Title: {item.Title.Text}");
-                console.WriteLine($"Published: {item.PublishDate:yyyy-MM-dd HH:mm}");
-                if (item.Summary != null) {
-                    console.WriteLine($"Summary: {item.Summary.Text}");
-                }
-                console.WriteLine($"Link: {item.Links.FirstOrDefault()?.Uri}");
-                console.WriteLine(new string('-', 50));
-            }
+            LearnFeedAsync(console, feed);
         }
         catch (HttpRequestException ex) {
             console.Error.WriteLine($"Error fetching RSS feed: {ex.Message}");
@@ -54,7 +40,7 @@ public class LearnHandler : IApplicationHandler {
         }
     }
 
-    private static async Task<SyndicationFeed> ReadRssFeedAsync(IHttpClientFactory httpClientFactory, string url) {
+    internal static async Task<SyndicationFeed> ReadRssFeedAsync(IHttpClientFactory httpClientFactory, string url) {
         using var httpClient = httpClientFactory.CreateClient();
         var feedContent = await httpClient.GetStringAsync(url);
 
@@ -62,5 +48,22 @@ public class LearnHandler : IApplicationHandler {
         using var xmlReader = XmlReader.Create(stringReader);
 
         return SyndicationFeed.Load(xmlReader);
+    }
+
+    internal static void LearnFeedAsync(IConsole console, SyndicationFeed feed) {
+        console.WriteLine($"Feed Title: {feed.Title.Text}");
+        console.WriteLine($"Feed Description: {feed.Description.Text}");
+        console.WriteLine($"Number of items: {feed.Items.Count()}");
+        console.WriteLine(string.Empty);
+
+        foreach (var item in feed.Items) {
+            console.WriteLine($"Title: {item.Title.Text}");
+            console.WriteLine($"Published: {item.PublishDate:yyyy-MM-dd HH:mm}");
+            if (item.Summary != null) {
+                console.WriteLine($"Summary: {item.Summary.Text}");
+            }
+            console.WriteLine($"Link: {item.Links.FirstOrDefault()?.Uri}");
+            console.WriteLine(new string('-', 50));
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AideMemoire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("AideMemoire.Tests")]
 
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 

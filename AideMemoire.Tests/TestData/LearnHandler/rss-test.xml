@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Test RSS Feed</title>
+        <description>A simple test RSS feed for unit testing</description>
+        <link>https://example.com</link>
+        <language>en-us</language>
+        <pubDate>Mon, 13 Jun 2025 10:00:00 GMT</pubDate>
+        <lastBuildDate>Mon, 13 Jun 2025 10:00:00 GMT</lastBuildDate>
+        
+        <item>
+            <title>First Test Article</title>
+            <description>This is the first test article description</description>
+            <link>https://example.com/article1</link>
+            <pubDate>Mon, 13 Jun 2025 10:00:00 GMT</pubDate>
+            <guid>https://example.com/article1</guid>
+        </item>
+        
+        <item>
+            <title>Second Test Article</title>
+            <description>This is the second test article description</description>
+            <link>https://example.com/article2</link>
+            <pubDate>Mon, 13 Jun 2025 09:30:00 GMT</pubDate>
+            <guid>https://example.com/article2</guid>
+        </item>
+        
+        <item>
+            <title>Third Test Article</title>
+            <description>This is the third test article description with &amp; special chars</description>
+            <link>https://example.com/article3</link>
+            <pubDate>Mon, 13 Jun 2025 09:00:00 GMT</pubDate>
+            <guid>https://example.com/article3</guid>
+        </item>
+    </channel>
+</rss>
