@@ -1,3 +1,3 @@
 ﻿using AideMemoire;
 
-await new Application().RunAsync(args);
+return await new Application().RunAsync(args);
