@@ -1,3 +1,18 @@
 ﻿using AideMemoire;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-return await new Application().RunAsync(args);
+var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
+
+// register services
+builder.Services.AddSingleton<Application>();
+
+// execute
+host = builder.Build();
+await host.Services.GetRequiredService<Application>().RunAsync(args);
+
+public partial class Program {
+    private static IHost? host;
+
+    internal static IHost Host { get => host!; }
+}
