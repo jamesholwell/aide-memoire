@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AideMemoire",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/AideMemoire/AideMemoire.csproj",
+        },
+        {
+            "name": "AideMemoire (with args)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/AideMemoire/bin/Debug/net9.0/AideMemoire.dll",
+            "cwd": "${workspaceFolder}/AideMemoire",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": {
+                "moduleLoad": false
+            },
+            "args": [
+                "about"
+            ]
+        }
+    ]
+}
