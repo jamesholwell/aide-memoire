@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+    <channel>
+        <title><![CDATA[BBC News]]></title>
+        <description><![CDATA[BBC News - News Front Page]]></description>
+        <link>https://www.bbc.co.uk/news</link>
+        <image>
+            <url>https://news.bbcimg.co.uk/nol/shared/img/bbc_news_120x60.gif</url>
+            <title>BBC News</title>
+            <link>https://www.bbc.co.uk/news</link>
+        </image>
+        <generator>RSS for Node</generator>
+        <lastBuildDate>Fri, 13 Jun 2025 22:06:08 GMT</lastBuildDate>
+        <atom:link href="https://feeds.bbci.co.uk/news/rss.xml" rel="self" type="application/rss+xml"/>
+        <copyright><![CDATA[Copyright: (C) British Broadcasting Corporation, see https://www.bbc.co.uk/usingthebbc/terms-of-use/#15metadataandrssfeeds for terms and conditions of reuse.]]></copyright>
+        <language><![CDATA[en-gb]]></language>
+        <ttl>15</ttl>
+        <item>
+            <title><![CDATA[Amber thunderstorm warning in force after UK's hottest day]]></title>
+            <description><![CDATA[The Met Office warning comes as Friday could break the record for the hottest day of the year so far.]]></description>
+            <link>https://www.bbc.com/news/articles/c93lrqk60geo</link>
+            <guid isPermaLink="false">https://www.bbc.com/news/articles/c93lrqk60geo#2</guid>
+            <pubDate>Fri, 13 Jun 2025 22:02:42 GMT</pubDate>
+            <media:thumbnail width="240" height="135" url="https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/f898/live/89a21110-4887-11f0-948d-d119ba409e55.png"/>
+        </item>
+        <item>
+            <title><![CDATA[Meta AI searches made public - but do all its users realise?]]></title>
+            <description><![CDATA[Meta AI users may be inadvertently making their searches public without realising it.]]></description>
+            <link>https://www.bbc.com/news/articles/c0573lj172jo</link>
+            <guid isPermaLink="false">https://www.bbc.com/news/articles/c0573lj172jo#2</guid>
+            <pubDate>Fri, 13 Jun 2025 12:01:50 GMT</pubDate>
+            <media:thumbnail width="240" height="135" url="https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/2cad/live/513724b0-484f-11f0-bfce-4fdf1dd09cc7.jpg"/>
+        </item>
+    </channel>
+</rss>
