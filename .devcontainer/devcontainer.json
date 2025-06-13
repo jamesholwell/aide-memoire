@@ -1,0 +1,11 @@
+// Reference: https://aka.ms/devcontainer.json 
+// See also: https://containers.dev/features
+{
+	"name": "C# (.NET)",
+	"image": "mcr.microsoft.com/devcontainers/dotnet",
+	"features": {
+	    "ghcr.io/devcontainers/features/powershell:1": {}
+	},
+
+	"postCreateCommand": "dotnet restore"
+}
