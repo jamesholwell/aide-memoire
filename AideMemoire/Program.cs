@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 
 // register services
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<Application>();
 
 // execute
