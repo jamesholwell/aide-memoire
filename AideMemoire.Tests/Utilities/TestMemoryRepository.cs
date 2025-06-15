@@ -22,6 +22,16 @@ public class TestMemoryRepository : IMemoryRepository {
         return Task.FromResult<IEnumerable<Memory>>(results);
     }
 
+    public Task<IEnumerable<Memory>> SearchInRealmAsync(Realm realm, string term) {
+        var results = _memories
+            .Where(m => m.Realm.Id == realm.Id && 
+                       ((m.Title?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) || 
+                        (m.Content?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)))
+            .ToArray();
+
+        return Task.FromResult<IEnumerable<Memory>>(results);
+    }
+
     public Task<Memory> AddAsync(Memory memory) {
         // simulate the primary key generation
         typeof(Memory).GetField("id", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(memory, _nextId++);

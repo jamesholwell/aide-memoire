@@ -27,7 +27,16 @@ public class MemoryRepository(AideMemoireDbContext context) : IMemoryRepository 
         _context.Memories
             .Include(m => m.Realm)
             .Where(m => m.Title.Contains(term) || (m.Content != null && m.Content.Contains(term)))
-            .OrderByDescending(m => m.CreatedAt)
+            .OrderByDescending(m => m.LastUpdatedAt)
+            .ToListAsync()
+            .ContinueWith(t => (IEnumerable<Memory>)t.Result);
+
+    public Task<IEnumerable<Memory>> SearchInRealmAsync(Realm realm, string term) =>
+        _context.Memories
+            .Include(m => m.Realm)
+            .Where(m => EF.Property<long>(m, "realmId") == realm.Id && 
+                       (m.Title.Contains(term) || (m.Content != null && m.Content.Contains(term))))
+            .OrderByDescending(m => m.LastUpdatedAt)
             .ToListAsync()
             .ContinueWith(t => (IEnumerable<Memory>)t.Result);
 

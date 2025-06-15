@@ -11,5 +11,7 @@ public interface IMemoryRepository {
 
     Task<IEnumerable<Memory>> SearchAsync(string term);
 
+    Task<IEnumerable<Memory>> SearchInRealmAsync(Realm realm, string term);
+
     Task<Memory> AddAsync(Memory memory);
 }
