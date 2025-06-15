@@ -13,7 +13,7 @@ public class Memory {
 
     private DateTime lastUpdatedAt;
 
-    public Memory(Realm realm, string key, string title, string content) {
+    public Memory(Realm realm, string key, string title, string? content) {
         this.createdAt = DateTime.UtcNow;
         this.lastUpdatedAt = this.createdAt;
 
@@ -21,6 +21,15 @@ public class Memory {
         this.key = key ?? throw new ArgumentNullException(nameof(key), "Memory key cannot be null");
         this.Title = title;
         this.Content = content;
+    }
+
+    private Memory(string key, string title) {
+        // ef core constructor for deserialization
+        this.key = key;
+        this.Title = title;
+        this.realm = null!; // realm will be set later
+        this.createdAt = DateTime.MinValue;
+        this.lastUpdatedAt = DateTime.MinValue;
     }
 
     public long Id => id;

@@ -52,3 +52,6 @@ ehthumbs.db
 # OS specific files
 Desktop.ini
 .DS_Store
+
+# sqlite database files
+aide-memoire.db
