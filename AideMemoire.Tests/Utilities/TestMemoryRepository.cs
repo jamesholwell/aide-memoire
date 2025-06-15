@@ -12,6 +12,8 @@ public class TestMemoryRepository : IMemoryRepository {
 
     public Task<bool> ExistsAsync(Realm realm, string key) => Task.FromResult(_memories.Any(m => m.Realm.Id == realm.Id && m.Key == key));
 
+    public Task<IEnumerable<Memory>> GetAllForRealmAsync(Realm realm) => Task.FromResult<IEnumerable<Memory>>(_memories.Where(m => m.Realm.Id == realm.Id).ToArray());
+
     public Task<IEnumerable<Memory>> SearchAsync(string term) {
         var results = _memories
             .Where(m => (m.Title?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false) || (m.Content?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false))

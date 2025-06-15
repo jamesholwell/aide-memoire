@@ -7,7 +7,9 @@ public interface IMemoryRepository {
 
     Task<bool> ExistsAsync(Realm realm, string key);
 
+    Task<IEnumerable<Memory>> GetAllForRealmAsync(Realm realm);
+
     Task<IEnumerable<Memory>> SearchAsync(string term);
-    
+
     Task<Memory> AddAsync(Memory memory);
 }

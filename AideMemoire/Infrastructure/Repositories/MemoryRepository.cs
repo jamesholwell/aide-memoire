@@ -15,6 +15,14 @@ public class MemoryRepository(AideMemoireDbContext context) : IMemoryRepository 
     public Task<bool> ExistsAsync(Realm realm, string key) =>
         _context.Memories.AnyAsync(m => EF.Property<long>(m, "realmId") == realm.Id && m.Key == key);
 
+    public Task<IEnumerable<Memory>> GetAllForRealmAsync(Realm realm) =>
+        _context.Memories
+            .Include(m => m.Realm)
+            .Where(m => EF.Property<long>(m, "realmId") == realm.Id)
+            .OrderByDescending(m => m.LastUpdatedAt)
+            .ToListAsync()
+            .ContinueWith(t => (IEnumerable<Memory>)t.Result);
+
     public Task<IEnumerable<Memory>> SearchAsync(string term) =>
         _context.Memories
             .Include(m => m.Realm)
