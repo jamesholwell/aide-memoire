@@ -40,13 +40,14 @@ public class AideMemoireDbContext : DbContext {
         // memory configuration
         modelBuilder.Entity<Memory>(entity => {
             entity.HasKey(r => r.Id);
+
+            entity.HasOne(r => r.Realm)
+                .WithMany()
+                .HasForeignKey("realmId")
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.Property(r => r.Id)
                 .HasField("id")
-                .UsePropertyAccessMode(PropertyAccessMode.Field)
-                .ValueGeneratedOnAdd();
-
-            entity.Property(r => r.Realm)
-                .HasField("realm")
                 .UsePropertyAccessMode(PropertyAccessMode.Field)
                 .ValueGeneratedOnAdd();
 

@@ -12,10 +12,8 @@ public class MemoryRepository(AideMemoireDbContext context) : IMemoryRepository 
             .Include(m => m.Realm)
             .SingleOrDefaultAsync(m => m.Id == id);
 
-    public Task<Memory?> GetByKeyAsync(Realm realm, string key) =>
-        _context.Memories
-            .Include(m => m.Realm)
-            .SingleOrDefaultAsync(m => m.Realm == realm && m.Key == key);
+    public Task<bool> ExistsAsync(Realm realm, string key) =>
+        _context.Memories.AnyAsync(m => EF.Property<long>(m, "realmId") == realm.Id && m.Key == key);
 
     public Task<IEnumerable<Memory>> SearchAsync(string term) =>
         _context.Memories

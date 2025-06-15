@@ -5,8 +5,6 @@ public class Memory {
     private readonly long id;
 #pragma warning restore 0649
 
-    private readonly Realm realm;
-
     private readonly string key;
 
     private readonly DateTime createdAt;
@@ -17,24 +15,27 @@ public class Memory {
         this.createdAt = DateTime.UtcNow;
         this.lastUpdatedAt = this.createdAt;
 
-        this.realm = realm ?? throw new ArgumentNullException(nameof(realm), "Realm cannot be null");
+        this.Realm = realm ?? throw new ArgumentNullException(nameof(realm), "Realm cannot be null");
+        this.realmId = realm.Id;
         this.key = key ?? throw new ArgumentNullException(nameof(key), "Memory key cannot be null");
         this.Title = title;
         this.Content = content;
     }
 
-    private Memory(string key, string title) {
+    private Memory() {
         // ef core constructor for deserialization
-        this.key = key;
-        this.Title = title;
-        this.realm = null!; // realm will be set later
+        this.key = string.Empty;
+        this.Realm = null!;
+        this.Title = string.Empty;
         this.createdAt = DateTime.MinValue;
         this.lastUpdatedAt = DateTime.MinValue;
     }
 
     public long Id => id;
 
-    public Realm Realm => realm;
+    private long realmId { get; set; }
+    
+    public Realm Realm { get; private set; }
 
     public string Key => key;
 
