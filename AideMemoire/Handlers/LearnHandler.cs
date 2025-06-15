@@ -1,7 +1,10 @@
 using System.CommandLine;
 using System.CommandLine.IO;
 using System.ServiceModel.Syndication;
+using System.Threading.Tasks;
 using System.Xml;
+using AideMemoire.Domain;
+using AideMemoire.Infrastructure.Repositories;
 
 namespace AideMemoire.Handlers;
 
@@ -19,15 +22,22 @@ public class LearnHandler : IApplicationHandler {
             ExecuteAsync,
             new ConsoleBinder(),
             new HttpClientFactoryBinder(),
+            new RealmRepositoryBinder(),
+            new MemoryRepositoryBinder(),
             urlArgument);
 
         root.AddCommand(learnCommand);
     }
 
-    internal static async Task ExecuteAsync(IConsole console, IHttpClientFactory httpClientFactory, string url) {
+    internal static async Task ExecuteAsync(
+        IConsole console,
+        IHttpClientFactory httpClientFactory,
+        IRealmRepository realmRepository,
+        IMemoryRepository memoryRepository,
+        string url) {
         try {
             var feed = await ReadRssFeedAsync(httpClientFactory, url);
-            LearnFeedAsync(console, feed);
+            await LearnFeedAsync(realmRepository, memoryRepository, feed);
         }
         catch (HttpRequestException ex) {
             console.Error.WriteLine($"Error fetching RSS feed: {ex.Message}");
@@ -50,20 +60,29 @@ public class LearnHandler : IApplicationHandler {
         return SyndicationFeed.Load(xmlReader);
     }
 
-    internal static void LearnFeedAsync(IConsole console, SyndicationFeed feed) {
-        console.WriteLine($"Feed Title: {feed.Title.Text}");
-        console.WriteLine($"Feed Description: {feed.Description.Text}");
-        console.WriteLine($"Number of items: {feed.Items.Count()}");
-        console.WriteLine(string.Empty);
+    internal static async Task LearnFeedAsync(
+        IRealmRepository realmRepository,
+        IMemoryRepository memoryRepository,
+        SyndicationFeed feed) {
+        string realmKey =
+            feed.Links.FirstOrDefault(l => l.RelationshipType == "self")?.Uri.ToString()
+            ?? feed.Title.Text
+            ?? throw new InvalidOperationException("Feed must have a title or self link");
+
+        var realm =
+            await realmRepository.GetByKeyAsync(realmKey)
+            ?? await realmRepository.AddAsync(new Realm(realmKey, feed.Title.Text, feed.Description?.Text));                
 
         foreach (var item in feed.Items) {
-            console.WriteLine($"Title: {item.Title.Text}");
-            console.WriteLine($"Published: {item.PublishDate:yyyy-MM-dd HH:mm}");
-            if (item.Summary != null) {
-                console.WriteLine($"Summary: {item.Summary.Text}");
-            }
-            console.WriteLine($"Link: {item.Links.FirstOrDefault()?.Uri}");
-            console.WriteLine(new string('-', 50));
+            var memoryKey = item.Id ?? item.Links.FirstOrDefault(l => l.RelationshipType == "self")?.Uri.ToString() ?? item.Title.Text;
+
+            if (await memoryRepository.ExistsAsync(realm, memoryKey))
+                continue;
+
+            await memoryRepository.AddAsync(new Memory(realm, memoryKey, item.Title.Text, item.Summary?.Text) {
+                Uri = item.Links.FirstOrDefault()?.Uri,
+                EnclosureUri = item.Links.FirstOrDefault(l => l.RelationshipType == "enclosure")?.Uri
+            });
         }
     }
 }
