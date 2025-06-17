@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 // create host and configure services
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
 ConfigureDatabaseServices(builder);
+ConfigureLogging(builder, args.Contains("--verbose") || args.Contains("-v"));
 ConfigureOtherServices(builder);
 builder.Services.AddSingleton<Application>();
 host = builder.Build();
@@ -44,14 +45,26 @@ public partial class Program {
             .ConfigureRunner(rb => rb
                 .AddSQLite()
                 .WithGlobalConnectionString(connectionString)
-                .ScanIn(typeof(Program).Assembly).For.Migrations())
-            .AddLogging(lb => lb
-                .SetMinimumLevel(LogLevel.Warning)
-                .AddFilter("FluentMigrator", LogLevel.Warning)
-                .AddFilter("DatabaseMigrationService", LogLevel.Information));
+                .ScanIn(typeof(Program).Assembly).For.Migrations());
 
         // migration
         builder.Services.AddSingleton<DatabaseMigrationService>();
+    }
+
+    internal static void ConfigureLogging(HostApplicationBuilder builder, bool isVerbose) {
+        string[] internalLoggers = [
+            typeof(DatabaseMigrationService).FullName!
+        ];
+
+        builder.Services.AddLogging(options => options
+            .ClearProviders()
+            .AddSimpleConsole(consoleOptions => {
+                consoleOptions.IncludeScopes = false;
+                consoleOptions.SingleLine = true;
+            })
+            .AddFilter((category, level) =>
+                level >= (internalLoggers.Contains(category) || isVerbose ? LogLevel.Information : LogLevel.Warning)
+            ));
     }
 
     internal static void ConfigureOtherServices(HostApplicationBuilder builder) {

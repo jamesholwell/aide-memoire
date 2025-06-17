@@ -18,6 +18,9 @@ public class Application(IConsole console) {
         // default handler (for when no command is specified)
         rootCommand.SetHandler(DefaultHandler);
 
+        // add global options
+        rootCommand.AddGlobalOption(new Option<bool>(["--verbose", "-v"], "Enable verbose output"));
+
         return await rootCommand.InvokeAsync(args, console);
     }
 
