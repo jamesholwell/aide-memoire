@@ -12,12 +12,21 @@ using Microsoft.SemanticKernel;
 
 [assembly: InternalsVisibleTo("AideMemoire.Tests")]
 
+// create bootstrapper
+var bootstrapBuilder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
+ConfigureHttpClient(bootstrapBuilder);
+ConfigureLogging(bootstrapBuilder, args.Contains("--verbose") || args.Contains("-v"));
+bootstrapBuilder.Services.AddSingleton<OnnxModelDownloadService>();
+var bootstrapper = bootstrapBuilder.Build();
+await bootstrapper.Services.GetRequiredService<OnnxModelDownloadService>().DownloadModelsAsync();
+
 // create host and configure services
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
+ConfigureHttpClient(builder);
+ConfigureLogging(builder, args.Contains("--verbose") || args.Contains("-v"));
 ConfigureAIServices(builder);
 ConfigureDatabaseServices(builder);
-ConfigureLogging(builder, args.Contains("--verbose") || args.Contains("-v"));
-ConfigureOtherServices(builder);
+ConfigureMediator(builder);
 builder.Services.AddSingleton<Application>();
 host = builder.Build();
 
@@ -35,8 +44,8 @@ public partial class Program {
     internal static void ConfigureAIServices(HostApplicationBuilder builder) {
         #pragma warning disable SKEXP0070
         builder.Services.AddBertOnnxEmbeddingGenerator(
-            onnxModelPath: "Models/minilm-l12-v2.onnx",
-            vocabPath: "Models/minilm-l12-v2_vocab.txt"
+            onnxModelPath: OnnxModelDownloadService.GetPath("minilm-l12-v2.onnx"),
+            vocabPath: OnnxModelDownloadService.GetPath("minilm-l12-v2_vocab.txt")
         );
     }
 
@@ -68,6 +77,7 @@ public partial class Program {
     internal static void ConfigureLogging(HostApplicationBuilder builder, bool isVerbose) {
         string[] internalLoggers = [
             nameof(AideMemoire.Handlers.MemoryUpdatedEmbeddingHandler),
+            typeof(OnnxModelDownloadService).FullName!,
             typeof(DatabaseMigrationService).FullName!,
         ];
 
@@ -82,10 +92,12 @@ public partial class Program {
             ));
     }
 
-    internal static void ConfigureOtherServices(HostApplicationBuilder builder) {
+    internal static void ConfigureMediator(HostApplicationBuilder builder) {
         builder.Services
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-        
+    }
+
+    internal static void ConfigureHttpClient(HostApplicationBuilder builder) {
         builder.Services
             .AddHttpClient()
             .ConfigureHttpClientDefaults(builder => {
