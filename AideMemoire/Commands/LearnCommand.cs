@@ -1,10 +1,12 @@
 using System.CommandLine;
 using System.CommandLine.IO;
 using System.ServiceModel.Syndication;
-using System.Threading.Tasks;
 using System.Xml;
+using AideMemoire.Binding;
 using AideMemoire.Domain;
+using AideMemoire.Domain.Events;
 using AideMemoire.Infrastructure.Repositories;
+using MediatR;
 
 namespace AideMemoire.Commands;
 
@@ -21,6 +23,7 @@ public class LearnCommand : IApplicationCommand {
         rssCommand.SetHandler(
             ExecuteAsync,
             new ConsoleBinder(),
+            new MediatorBinder(),
             new HttpClientFactoryBinder(),
             new RealmRepositoryBinder(),
             new MemoryRepositoryBinder(),
@@ -31,13 +34,14 @@ public class LearnCommand : IApplicationCommand {
 
     internal static async Task ExecuteAsync(
         IConsole console,
+        IMediator mediator,
         IHttpClientFactory httpClientFactory,
         IRealmRepository realmRepository,
         IMemoryRepository memoryRepository,
         string url) {
         try {
             var feed = await ReadRssFeedAsync(httpClientFactory, url);
-            await LearnFeedAsync(realmRepository, memoryRepository, feed);
+            await LearnFeedAsync(mediator, realmRepository, memoryRepository, feed);
         }
         catch (HttpRequestException ex) {
             console.Error.WriteLine($"Error fetching RSS feed: {ex.Message}");
@@ -61,6 +65,7 @@ public class LearnCommand : IApplicationCommand {
     }
 
     internal static async Task LearnFeedAsync(
+        IMediator mediator,
         IRealmRepository realmRepository,
         IMemoryRepository memoryRepository,
         SyndicationFeed feed) {
@@ -79,10 +84,12 @@ public class LearnCommand : IApplicationCommand {
             if (await memoryRepository.ExistsAsync(realm, memoryKey))
                 continue;
 
-            await memoryRepository.AddAsync(new Memory(realm, memoryKey, item.Title.Text, item.Summary?.Text) {
+            var memory = await memoryRepository.AddAsync(new Memory(realm, memoryKey, item.Title.Text, item.Summary?.Text) {
                 Uri = item.Links.FirstOrDefault()?.Uri,
                 EnclosureUri = item.Links.FirstOrDefault(l => l.RelationshipType == "enclosure")?.Uri
             });
+
+            await mediator.Publish(new MemoryUpdated(memory));
         }
     }
 }

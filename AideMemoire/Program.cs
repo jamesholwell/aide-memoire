@@ -56,6 +56,9 @@ public partial class Program {
 
     internal static void ConfigureOtherServices(HostApplicationBuilder builder) {
         builder.Services
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+        
+        builder.Services
             .AddHttpClient()
             .ConfigureHttpClientDefaults(builder => {
                 builder.ConfigureHttpClient(client => {
