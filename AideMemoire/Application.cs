@@ -1,6 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.IO;
-using AideMemoire.Handlers;
+using AideMemoire.Commands;
 
 namespace AideMemoire;
 
@@ -13,7 +13,7 @@ public class Application(IConsole console) {
         var rootCommand = new RootCommand("aide-mémoire");
 
         // Use reflection to discover and add all command handlers
-        DiscoverHandlers(rootCommand);
+        DiscoverCommands(rootCommand);
 
         // default handler (for when no command is specified)
         rootCommand.SetHandler(DefaultHandler);
@@ -21,24 +21,24 @@ public class Application(IConsole console) {
         return await rootCommand.InvokeAsync(args, console);
     }
 
-    private void DiscoverHandlers(RootCommand rootCommand) {
-        var handlerTypes = typeof(AboutHandler).Assembly
+    private void DiscoverCommands(RootCommand rootCommand) {
+        var commandTypes = typeof(AboutCommand).Assembly
             .GetTypes()
             .Where(type =>
                 !type.IsInterface
                 && !type.IsAbstract
-                && typeof(IApplicationHandler).IsAssignableFrom(type));
+                && typeof(IApplicationCommand).IsAssignableFrom(type));
 
-        foreach (var handlerType in handlerTypes) {
-            if (Activator.CreateInstance(handlerType) is not IApplicationHandler handler) {
-                throw new InvalidOperationException($"Could not create instance of {handlerType.Name}");
+        foreach (var commandType in commandTypes) {
+            if (Activator.CreateInstance(commandType) is not IApplicationCommand command) {
+                throw new InvalidOperationException($"Could not create instance of {commandType.Name}");
             }
 
-            handler.RegisterCommand(rootCommand);
+            command.RegisterCommand(rootCommand);
         }
     }
 
     private void DefaultHandler() {
-        AboutHandler.ShowAboutInformation(console);
+        AboutCommand.ShowAboutInformation(console);
     }
 }

@@ -2,9 +2,9 @@ using System.CommandLine;
 
 namespace AideMemoire;
 
-public interface IApplicationHandler {
+public interface IApplicationCommand {
     /// <summary>
-    ///     Registers the handler with the root
+    ///     Registers the command with the root
     /// </summary>
     void RegisterCommand(RootCommand root);
 }

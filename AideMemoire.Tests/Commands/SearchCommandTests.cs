@@ -1,12 +1,12 @@
 using System.CommandLine;
 using System.CommandLine.IO;
 using AideMemoire.Domain;
-using AideMemoire.Handlers;
+using AideMemoire.Commands;
 using AideMemoire.Tests.Utilities;
 
-namespace AideMemoire.Tests.Handlers;
+namespace AideMemoire.Tests.Commands;
 
-public class SearchHandlerTests {
+public class SearchCommandTests {
     private readonly TestRealmRepository _realmRepository = new();
 
     private readonly TestMemoryRepository _memoryRepository = new();
@@ -19,7 +19,7 @@ public class SearchHandlerTests {
         var rootCommand = new RootCommand();
 
         // act
-        new SearchHandler().RegisterCommand(rootCommand);
+        new SearchCommand().RegisterCommand(rootCommand);
 
         // assert
         var searchCommand = rootCommand.Children.OfType<Command>().FirstOrDefault(c => c.Name == "search");
@@ -34,7 +34,7 @@ public class SearchHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm, "article1", "First Article", "First article content"));
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "nonexistent", null);
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "nonexistent", null);
 
         // assert
         Assert.Contains("No memories found for search term: nonexistent", _console.Out.ToString());
@@ -49,7 +49,7 @@ public class SearchHandlerTests {
         });
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
 
         // assert
         var output = _console.Out.ToString();
@@ -67,7 +67,7 @@ public class SearchHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm, "article1", "Article Title", "This contains special keyword"));
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "keyword", null);
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "keyword", null);
 
         // assert
         var output = _console.Out.ToString();
@@ -85,7 +85,7 @@ public class SearchHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm2, "tech1", "Tech Article", "Tech content"));
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Article", "tech");
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Article", "tech");
 
         // assert
         var output = _console.Out.ToString();
@@ -101,7 +101,7 @@ public class SearchHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm, "article1", "Test Article", "Content"));
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", "invalid-realm");
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", "invalid-realm");
 
         // assert
         Assert.Contains("Could not find any realm matching 'invalid-realm'", _console.Error.ToString());
@@ -115,7 +115,7 @@ public class SearchHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm, "article1", "Test Article", longContent));
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
 
         // assert
         var output = _console.Out.ToString();
@@ -133,7 +133,7 @@ public class SearchHandlerTests {
         }
 
         // act
-        await SearchHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
+        await SearchCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository, "Test", null);
 
         // assert
         var output = _console.Out.ToString();

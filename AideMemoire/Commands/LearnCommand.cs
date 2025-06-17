@@ -6,9 +6,9 @@ using System.Xml;
 using AideMemoire.Domain;
 using AideMemoire.Infrastructure.Repositories;
 
-namespace AideMemoire.Handlers;
+namespace AideMemoire.Commands;
 
-public class LearnHandler : IApplicationHandler {
+public class LearnCommand : IApplicationCommand {
     public void RegisterCommand(RootCommand root) {
         var learnCommand = new Command("learn", "Learn from an information source");
 

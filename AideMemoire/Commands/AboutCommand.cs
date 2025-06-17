@@ -1,8 +1,8 @@
 using System.CommandLine;
 
-namespace AideMemoire.Handlers;
+namespace AideMemoire.Commands;
 
-public class AboutHandler : IApplicationHandler {
+public class AboutCommand : IApplicationCommand {
     public void RegisterCommand(RootCommand root) {
         var aboutCommand = new Command("about", "Show information about the application");
         aboutCommand.SetHandler(ctx => ShowAboutInformation(ctx.Console));

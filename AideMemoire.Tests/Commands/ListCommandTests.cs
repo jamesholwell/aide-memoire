@@ -1,12 +1,12 @@
 using System.CommandLine;
 using System.CommandLine.IO;
 using AideMemoire.Domain;
-using AideMemoire.Handlers;
+using AideMemoire.Commands;
 using AideMemoire.Tests.Utilities;
 
-namespace AideMemoire.Tests.Handlers;
+namespace AideMemoire.Tests.Commands;
 
-public class ListHandlerTests {
+public class ListCommandTests {
     private readonly TestRealmRepository _realmRepository = new();
 
     private readonly TestMemoryRepository _memoryRepository = new();
@@ -19,7 +19,7 @@ public class ListHandlerTests {
         var rootCommand = new RootCommand();
 
         // act
-        new ListHandler().RegisterCommand(rootCommand);
+        new ListCommand().RegisterCommand(rootCommand);
 
         // assert
         var listCommand = rootCommand.Children.OfType<Command>().FirstOrDefault(c => c.Name == "list");
@@ -30,7 +30,7 @@ public class ListHandlerTests {
     [Fact]
     public async Task ExecuteAsync_NoRealms_ShouldDisplayNoRealmsMessage() {
         // act
-        await ListHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository);
+        await ListCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository);
 
         // assert
         Assert.Contains("No memory realms found.", _console.Out.ToString());
@@ -44,7 +44,7 @@ public class ListHandlerTests {
         await _memoryRepository.AddAsync(new Memory(realm, "article2", "Second Article", "Second article content"));
 
         // act
-        await ListHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository);
+        await ListCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository);
 
         // assert
         var output = _console.Out.ToString();
@@ -62,7 +62,7 @@ public class ListHandlerTests {
         await _memoryRepository.AddAsync(new Memory(fullRealm, "memory1", "Important Memory", "Important content"));
 
         // act
-        await ListHandler.ExecuteAsync(_console, _realmRepository, _memoryRepository);
+        await ListCommand.ExecuteAsync(_console, _realmRepository, _memoryRepository);
 
         // assert
         var output = _console.Out.ToString();

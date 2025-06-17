@@ -3,9 +3,9 @@ using System.CommandLine.IO;
 using AideMemoire.Domain;
 using AideMemoire.Infrastructure.Repositories;
 
-namespace AideMemoire.Handlers;
+namespace AideMemoire.Commands;
 
-public class SearchHandler : IApplicationHandler {
+public class SearchCommand : IApplicationCommand {
     public void RegisterCommand(RootCommand root) {
         var searchCommand = new Command("search", "Search memories by term");
 

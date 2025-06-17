@@ -2,12 +2,12 @@ using System.CommandLine;
 using System.CommandLine.IO;
 using System.Net;
 using System.Xml;
-using AideMemoire.Handlers;
+using AideMemoire.Commands;
 using AideMemoire.Tests.Utilities;
 
-namespace AideMemoire.Tests.Handlers;
+namespace AideMemoire.Tests.Commands;
 
-public class LearnHandlerTests : IDisposable {
+public class LearnCommandTests : IDisposable {
     private readonly TestHttpClientFactory _http = new();
     private readonly TestRealmRepository _realmRepository = new();
     private readonly TestMemoryRepository _memoryRepository = new();
@@ -19,7 +19,7 @@ public class LearnHandlerTests : IDisposable {
         var rootCommand = new RootCommand();
 
         // act
-        new LearnHandler().RegisterCommand(rootCommand);
+        new LearnCommand().RegisterCommand(rootCommand);
 
         // assert - learn command
         var learnCommand = rootCommand.Children.OfType<Command>().FirstOrDefault(c => c.Name == "learn");
@@ -39,7 +39,7 @@ public class LearnHandlerTests : IDisposable {
         _http.Setup(testUrl, HttpStatusCode.OK, testRssContent, "application/rss+xml");
 
         // act
-        await LearnHandler.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
+        await LearnCommand.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
 
         // assert - verify realm was created
         var realms = _realmRepository.GetAllRealms();
@@ -61,7 +61,7 @@ public class LearnHandlerTests : IDisposable {
         _http.Setup(testUrl, HttpStatusCode.OK, testRssContent, "application/rss+xml");
 
         // act
-        await LearnHandler.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
+        await LearnCommand.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
 
         // assert - verify realm was created
         var realms = _realmRepository.GetAllRealms();
@@ -93,7 +93,7 @@ public class LearnHandlerTests : IDisposable {
 
         // act & assert
         await Assert.ThrowsAsync<HttpRequestException>(async () =>
-            await LearnHandler.ReadRssFeedAsync(_http, testUrl));
+            await LearnCommand.ReadRssFeedAsync(_http, testUrl));
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class LearnHandlerTests : IDisposable {
 
         // act & assert
         await Assert.ThrowsAsync<TaskCanceledException>(async () =>
-            await LearnHandler.ReadRssFeedAsync(_http, testUrl));
+            await LearnCommand.ReadRssFeedAsync(_http, testUrl));
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class LearnHandlerTests : IDisposable {
 
         // act & assert
         await Assert.ThrowsAsync<XmlException>(async () =>
-            await LearnHandler.ReadRssFeedAsync(_http, testUrl));
+            await LearnCommand.ReadRssFeedAsync(_http, testUrl));
     }
 
     [Fact]
@@ -127,8 +127,8 @@ public class LearnHandlerTests : IDisposable {
         _http.Setup(testUrl, HttpStatusCode.OK, testRssContent, "application/rss+xml");
 
         // act - process the same feed twice
-        await LearnHandler.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
-        await LearnHandler.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
+        await LearnCommand.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
+        await LearnCommand.ExecuteAsync(_console, _http, _realmRepository, _memoryRepository, testUrl);
 
         // assert - should still only have one realm and 3 memories
         var realms = _realmRepository.GetAllRealms();

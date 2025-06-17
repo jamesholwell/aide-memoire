@@ -2,9 +2,9 @@ using System.CommandLine;
 using System.CommandLine.IO;
 using AideMemoire.Infrastructure.Repositories;
 
-namespace AideMemoire.Handlers;
+namespace AideMemoire.Commands;
 
-public class ListHandler : IApplicationHandler {
+public class ListCommand : IApplicationCommand {
     public void RegisterCommand(RootCommand root) {
         var listCommand = new Command("list", "List all memories by realm");
         listCommand.SetHandler(
