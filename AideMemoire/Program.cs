@@ -8,10 +8,13 @@ using AideMemoire.Infrastructure.Repositories;
 using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
+
 [assembly: InternalsVisibleTo("AideMemoire.Tests")]
 
 // create host and configure services
 var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
+ConfigureAIServices(builder);
 ConfigureDatabaseServices(builder);
 ConfigureLogging(builder, args.Contains("--verbose") || args.Contains("-v"));
 ConfigureOtherServices(builder);
@@ -28,6 +31,14 @@ public partial class Program {
     private static IHost? host;
 
     internal static IHost Host { get => host!; }
+
+    internal static void ConfigureAIServices(HostApplicationBuilder builder) {
+        #pragma warning disable SKEXP0070
+        builder.Services.AddBertOnnxEmbeddingGenerator(
+            onnxModelPath: "Models/minilm-l12-v2.onnx",
+            vocabPath: "Models/minilm-l12-v2_vocab.txt"
+        );
+    }
 
     internal static void ConfigureDatabaseServices(HostApplicationBuilder builder) {
         // ef core
@@ -49,11 +60,15 @@ public partial class Program {
 
         // migration
         builder.Services.AddSingleton<DatabaseMigrationService>();
+
+        // vector stores
+        builder.Services.AddSqliteVectorStore(_ => "Data Source=aide-memoire.db");
     }
 
     internal static void ConfigureLogging(HostApplicationBuilder builder, bool isVerbose) {
         string[] internalLoggers = [
-            typeof(DatabaseMigrationService).FullName!
+            nameof(AideMemoire.Handlers.MemoryUpdatedEmbeddingHandler),
+            typeof(DatabaseMigrationService).FullName!,
         ];
 
         builder.Services.AddLogging(options => options
